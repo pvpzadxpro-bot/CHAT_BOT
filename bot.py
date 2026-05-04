@@ -5,16 +5,9 @@ import aiohttp
 from aiohttp import web
 import os
 
-# ═══════════════════════════════════════
-#        ТАНЗИМОТИ АСОСӢ
-# ═══════════════════════════════════════
-
 API_ID   = 35773150
 API_HASH = "1ae417974a581a8e409f7600097db8b2"
-
-# ═══════════════════════════════════════
-#        ПАЁМИ АВТОМАТӢ
-# ═══════════════════════════════════════
+PHONE    = os.environ.get("PHONE")
 
 PAEM = """
 **╔════════════════════════════╗**
@@ -37,10 +30,6 @@ PAEM = """
 **━━━━━━━━━━━━━━━━━━━━━━━━━━━━**
 """
 
-# ═══════════════════════════════════════
-#        FAKE ПОРТ
-# ═══════════════════════════════════════
-
 async def fake_server():
     async def handler(request):
         return web.Response(text="Bot is running!")
@@ -52,10 +41,6 @@ async def fake_server():
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
     print(f"✅  Порт {port} оғоз шуд!")
-
-# ═══════════════════════════════════════
-#        БЕДОР КАРДАНИ БОТ
-# ═══════════════════════════════════════
 
 async def keep_alive():
     url = os.environ.get("RENDER_EXTERNAL_URL")
@@ -70,14 +55,11 @@ async def keep_alive():
             print(f"⚠️  Хато: {e}")
         await asyncio.sleep(30)
 
-# ═══════════════════════════════════════
-#        АСОСИ КОД
-# ═══════════════════════════════════════
-
 app = Client(
     "zadxpro",
     api_id=API_ID,
-    api_hash=API_HASH
+    api_hash=API_HASH,
+    phone_number=PHONE
 )
 
 @app.on_message(filters.private & filters.incoming)
@@ -94,10 +76,6 @@ async def main():
     print("✅  Бот оғоз шуд...")
     asyncio.create_task(keep_alive())
     await asyncio.Event().wait()
-
-# ═══════════════════════════════════════
-#        ОҒОЗ
-# ═══════════════════════════════════════
 
 if __name__ == "__main__":
     asyncio.run(main())
