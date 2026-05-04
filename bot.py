@@ -9,8 +9,8 @@ import os
 #        ТАНЗИМОТИ АСОСӢ
 # ═══════════════════════════════════════
 
-API_ID   = 35773150
-API_HASH = "1ae417974a581a8e409f7600097db8b2"
+API_ID   = 35773150        # ← API ID худатон
+API_HASH = "1ae417974a581a8e409f7600097db8b2" # ← API HASH худатон
 
 # ═══════════════════════════════════════
 #        ПАЁМИ АВТОМАТӢ
@@ -18,7 +18,7 @@ API_HASH = "1ae417974a581a8e409f7600097db8b2"
 
 PAEM = """
 **╔════════════════════════════╗**
-**║        🤖  ZADXPRO БОТ          ║**
+**║        🤖  ZADXPRO БОТ    ║**
 **╚════════════════════════════╝**
 
 **🌙  Салом алейкум, {nom}!**
@@ -38,13 +38,12 @@ PAEM = """
 """
 
 # ═══════════════════════════════════════
-#        FAKE ПОРТ (барои Render)
+#        FAKE ПОРТ
 # ═══════════════════════════════════════
 
 async def fake_server():
     async def handler(request):
-        return web.Response(text="✅ Бот кор мекунад!")
-    
+        return web.Response(text="Bot is running!")
     server = web.Application()
     server.router.add_get("/", handler)
     runner = web.AppRunner(server)
@@ -52,20 +51,22 @@ async def fake_server():
     port = int(os.environ.get("PORT", 8080))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    print(f"✅  Fake порт {port} оғоз шуд!")
+    print(f"✅  Порт {port} оғоз шуд!")
 
 # ═══════════════════════════════════════
 #        БЕДОР КАРДАНИ БОТ
 # ═══════════════════════════════════════
 
 async def keep_alive():
-    # Render линкро худаш медиҳад
-    url = os.environ.get("RENDER_EXTERNAL_URL", "http://localhost:8080")
+    url = os.environ.get("RENDER_EXTERNAL_URL")
+    if not url:
+        print("⚠️  RENDER_EXTERNAL_URL нест, keep_alive кор намекунад")
+        return
     while True:
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
-                    print(f"✅  Бот бедор аст! Статус: {resp.status}")
+                    print(f"✅  Бедор! Статус: {resp.status}")
         except Exception as e:
             print(f"⚠️  Хато: {e}")
         await asyncio.sleep(30)
@@ -74,7 +75,11 @@ async def keep_alive():
 #        АСОСИ КОД
 # ═══════════════════════════════════════
 
-app = Client("zadxpro", api_id=API_ID, api_hash=API_HASH)
+app = Client(
+    "zadxpro",
+    api_id=API_ID,
+    api_hash=API_HASH
+)
 
 @app.on_message(filters.private & filters.incoming)
 async def auto_javob(client, message):
@@ -91,9 +96,7 @@ async def main():
     asyncio.create_task(keep_alive())
     await asyncio.Event().wait()
 
-# ═══════════════════════════════════════
-#        ОҒОЗ
-# ═══════════════════════════════════════
-
+if __name__ == "__main__":
+    asyncio.run(main())
 if __name__ == "__main__":
     asyncio.run(main())
