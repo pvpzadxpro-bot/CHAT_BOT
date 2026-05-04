@@ -5,16 +5,8 @@ import aiohttp
 from aiohttp import web
 import os
 
-# ═══════════════════════════════════════
-#        ТАНЗИМОТИ АСОСӢ
-# ═══════════════════════════════════════
-
-API_ID   = 35773150        # ← API ID худатон
-API_HASH = "1ae417974a581a8e409f7600097db8b2" # ← API HASH худатон
-
-# ═══════════════════════════════════════
-#        ПАЁМИ АВТОМАТӢ
-# ═══════════════════════════════════════
+API_ID   = 35773150
+API_HASH = "1ae417974a581a8e409f7600097db8b2"
 
 PAEM = """
 **╔════════════════════════════╗**
@@ -37,10 +29,6 @@ PAEM = """
 **━━━━━━━━━━━━━━━━━━━━━━━━━━━━**
 """
 
-# ═══════════════════════════════════════
-#        FAKE ПОРТ
-# ═══════════════════════════════════════
-
 async def fake_server():
     async def handler(request):
         return web.Response(text="Bot is running!")
@@ -53,14 +41,9 @@ async def fake_server():
     await site.start()
     print(f"✅  Порт {port} оғоз шуд!")
 
-# ═══════════════════════════════════════
-#        БЕДОР КАРДАНИ БОТ
-# ═══════════════════════════════════════
-
 async def keep_alive():
     url = os.environ.get("RENDER_EXTERNAL_URL")
     if not url:
-        print("⚠️  RENDER_EXTERNAL_URL нест, keep_alive кор намекунад")
         return
     while True:
         try:
@@ -71,30 +54,34 @@ async def keep_alive():
             print(f"⚠️  Хато: {e}")
         await asyncio.sleep(30)
 
-# ═══════════════════════════════════════
-#        АСОСИ КОД
-# ═══════════════════════════════════════
-
-app = Client(
-    "zadxpro",
-    api_id=API_ID,
-    api_hash=API_HASH
-)
-
-@app.on_message(filters.private & filters.incoming)
-async def auto_javob(client, message):
-    nom = message.from_user.first_name
-    await message.reply_text(
-        PAEM.format(nom=nom),
-        parse_mode=ParseMode.MARKDOWN
+async def main():
+    loop = asyncio.get_event_loop()
+    
+    app = Client(
+        "zadxpro",
+        api_id=API_ID,
+        api_hash=API_HASH,
+        no_updates=False
     )
 
-async def main():
+    @app.on_message(filters.private & filters.incoming)
+    async def auto_javob(client, message):
+        nom = message.from_user.first_name
+        await message.reply_text(
+            PAEM.format(nom=nom),
+            parse_mode=ParseMode.MARKDOWN
+        )
+
     await fake_server()
     await app.start()
     print("✅  Бот оғоз шуд...")
     asyncio.create_task(keep_alive())
     await asyncio.Event().wait()
+
+if __name__ == "__main__":
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(main())    await asyncio.Event().wait()
 
 if __name__ == "__main__":
     asyncio.run(main())
